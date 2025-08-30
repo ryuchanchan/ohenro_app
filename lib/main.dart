@@ -36,6 +36,37 @@ class _TempleListPageState extends State<TempleListPage> {
     _loadVisited(); // 保存済みデータを読み込み
   }
 
+  //追加
+  double get progress {
+    if (visited.isEmpty) return 0;
+    int done = visited.where((v) => v).length;
+    return done / visited.length;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('お遍路リスト - ${ (progress * 100).toStringAsFixed(1) }% 達成'),//追加
+      ),
+      body: ListView.builder(
+        itemCount: temples.length,
+        itemBuilder: (context, index) {
+          return CheckboxListTile(
+            title: Text(temples[index].name),
+            value: visited[index],
+            onChanged: (bool? value) {
+              setState(() {
+                visited[index] = value ?? false;
+              });
+              _saveVisited();
+            },
+          );
+        },
+      ),
+    );
+  }
+
   // ✅ 保存されているチェック状態を読み込み
   Future<void> _loadVisited() async {
     final prefs = await SharedPreferences.getInstance();
@@ -60,29 +91,5 @@ class _TempleListPageState extends State<TempleListPage> {
     // 保存直後に確認
     // final check = prefs.getStringList('visitedList');
     // print("保存直後に読み出し: $check");
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("お遍路リスト"),
-      ),
-      body: ListView.builder(
-        itemCount: temples.length,
-        itemBuilder: (context, index) {
-          return CheckboxListTile(
-            title: Text(temples[index].name),
-            value: visited[index],
-            onChanged: (bool? value) {
-              setState(() {
-                visited[index] = value ?? false;
-              });
-              _saveVisited(); // ✅ チェックしたら保存
-            },
-          );
-        },
-      ),
-    );
   }
 }
