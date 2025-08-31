@@ -120,6 +120,12 @@ class _TempleListPageState extends State<TempleListPage> {
               itemCount: temples.length,
               itemBuilder: (context, index) {
                 return CheckboxListTile(
+                  secondary: Image.asset(
+                    temples[index].imagePath,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
                   title: Text('${temples[index].number}. ${temples[index].name}'),
                   subtitle: Text(temples[index].prefecture),
                   value: visited[index],
