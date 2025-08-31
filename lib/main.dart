@@ -76,22 +76,44 @@ class _TempleListPageState extends State<TempleListPage> {
       body: Column(
         children: [
           // ✅ 進捗バーと数値
+          // Padding(
+          //   padding: const EdgeInsets.all(16.0),
+          //   child: Column(
+          //     children: [
+          //       LinearProgressIndicator(
+          //         value: progress,
+          //         minHeight: 20,
+          //         backgroundColor: Colors.grey[300],
+          //         color: Colors.green,
+          //       ),
+          //       SizedBox(height: 8),
+          //       Text('${(progress * 100).toStringAsFixed(1)}% 達成'),
+          //     ],
+          //   ),
+          // ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 20,
-                  backgroundColor: Colors.grey[300],
-                  color: Colors.green,
+                TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0, end: progress),
+                  duration: const Duration(milliseconds: 500), // 0.5秒かけて変化
+                  builder: (context, value, child) {
+                    return LinearProgressIndicator(
+                      value: value,
+                      minHeight: 20,
+                      backgroundColor: Colors.grey[300],
+                      color: Colors.green,
+                    );
+                  },
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text('${(progress * 100).toStringAsFixed(1)}% 達成'),
               ],
             ),
           ),
 
+        
           // ✅ チェックリスト
           Expanded(
             child: ListView.builder(
