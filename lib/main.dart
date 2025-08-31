@@ -43,26 +43,75 @@ class _TempleListPageState extends State<TempleListPage> {
     return done / visited.length;
   }
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: Text('お遍路リスト - ${ (progress * 100).toStringAsFixed(1) }% 達成'),//追加
+  //     ),
+  //     body: ListView.builder(
+  //       itemCount: temples.length,
+  //       itemBuilder: (context, index) {
+  //         return CheckboxListTile(
+  //           title: Text(temples[index].name),
+  //           value: visited[index],
+  //           onChanged: (bool? value) {
+  //             setState(() {
+  //               visited[index] = value ?? false;
+  //             });
+  //             _saveVisited();
+  //           },
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('お遍路リスト - ${ (progress * 100).toStringAsFixed(1) }% 達成'),//追加
+        title: Text('お遍路リスト'),
       ),
-      body: ListView.builder(
-        itemCount: temples.length,
-        itemBuilder: (context, index) {
-          return CheckboxListTile(
-            title: Text(temples[index].name),
-            value: visited[index],
-            onChanged: (bool? value) {
-              setState(() {
-                visited[index] = value ?? false;
-              });
-              _saveVisited();
-            },
-          );
-        },
+      body: Column(
+        children: [
+          // ✅ 進捗バーと数値
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 20,
+                  backgroundColor: Colors.grey[300],
+                  color: Colors.green,
+                ),
+                SizedBox(height: 8),
+                Text('${(progress * 100).toStringAsFixed(1)}% 達成'),
+              ],
+            ),
+          ),
+
+          // ✅ チェックリスト
+          Expanded(
+            child: ListView.builder(
+              itemCount: temples.length,
+              itemBuilder: (context, index) {
+                return CheckboxListTile(
+                  title: Text('${temples[index].number}. ${temples[index].name}'),
+                  subtitle: Text(temples[index].prefecture),
+                  value: visited[index],
+                  onChanged: (bool? value) {
+                    setState(() {
+                      visited[index] = value ?? false;
+                    });
+                    _saveVisited();
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
