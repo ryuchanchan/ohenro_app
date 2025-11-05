@@ -83,10 +83,12 @@ class _TempleListPageState extends State<TempleListPage> {
               itemBuilder: (context, index) {
                 final temple = allTemples[index];
                 return Card(
-                  elevation: 4,
+                  color: const Color(0xFFFAF4E6),
+                  elevation: 2,
                   margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
+                    side: const BorderSide(color: Color(0xFFD44A2E), width: 1), // 朱色の縁
                   ),
                   child: ListTile(
                     leading: ClipRRect(
