@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'data/temples.dart';
+import 'data/temples_all.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+Future<void> main() async {
+  await dotenv.load();
+  runApp(MyApp());
+}
 
 void main() {
   runApp(const OhenroApp());
@@ -32,72 +41,30 @@ class _TempleListPageState extends State<TempleListPage> {
   @override
   void initState() {
     super.initState();
-    visited = List.filled(temples.length, false); // 初期化
-    _loadVisited(); // 保存済みデータを読み込み
+    visited = List.filled(allTemples.length, false);
+    _loadVisited();
   }
 
-  //追加
   double get progress {
     if (visited.isEmpty) return 0;
     int done = visited.where((v) => v).length;
     return done / visited.length;
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       title: Text('お遍路リスト - ${ (progress * 100).toStringAsFixed(1) }% 達成'),//追加
-  //     ),
-  //     body: ListView.builder(
-  //       itemCount: temples.length,
-  //       itemBuilder: (context, index) {
-  //         return CheckboxListTile(
-  //           title: Text(temples[index].name),
-  //           value: visited[index],
-  //           onChanged: (bool? value) {
-  //             setState(() {
-  //               visited[index] = value ?? false;
-  //             });
-  //             _saveVisited();
-  //           },
-  //         );
-  //       },
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('お遍路リスト'),
-      ),
+      appBar: AppBar(title: const Text('お遍路リスト')),
       body: Column(
         children: [
-          // ✅ 進捗バーと数値
-          // Padding(
-          //   padding: const EdgeInsets.all(16.0),
-          //   child: Column(
-          //     children: [
-          //       LinearProgressIndicator(
-          //         value: progress,
-          //         minHeight: 20,
-          //         backgroundColor: Colors.grey[300],
-          //         color: Colors.green,
-          //       ),
-          //       SizedBox(height: 8),
-          //       Text('${(progress * 100).toStringAsFixed(1)}% 達成'),
-          //     ],
-          //   ),
-          // ),
+          // ✅ 進捗バー
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
                 TweenAnimationBuilder<double>(
                   tween: Tween<double>(begin: 0, end: progress),
-                  duration: const Duration(milliseconds: 500), // 0.5秒かけて変化
+                  duration: const Duration(milliseconds: 500),
                   builder: (context, value, child) {
                     return LinearProgressIndicator(
                       value: value,
@@ -113,27 +80,38 @@ class _TempleListPageState extends State<TempleListPage> {
             ),
           ),
 
-        
           // ✅ チェックリスト
           Expanded(
             child: ListView.builder(
-              itemCount: temples.length,
+              itemCount: allTemples.length,
               itemBuilder: (context, index) {
-                return CheckboxListTile(
-                  secondary: Image.asset(
-                    temples[index].imagePath,
+                final temple = allTemples[index];
+                return ListTile(
+                  leading: Image.asset(
+                    temple.imagePath,
                     width: 50,
                     height: 50,
                     fit: BoxFit.cover,
                   ),
-                  title: Text('${temples[index].number}. ${temples[index].name}'),
-                  subtitle: Text(temples[index].prefecture),
-                  value: visited[index],
-                  onChanged: (bool? value) {
-                    setState(() {
-                      visited[index] = value ?? false;
-                    });
-                    _saveVisited();
+                  title: Text('${temple.number}. ${temple.name}'),
+                  subtitle: Text(temple.prefecture),
+                  trailing: Checkbox(
+                    value: visited[index],
+                    onChanged: (bool? value) {
+                      setState(() {
+                        visited[index] = value ?? false;
+                      });
+                      _saveVisited();
+                    },
+                  ),
+                  onTap: () {
+                    // ✅ 詳細ページに遷移
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TempleDetailPage(temple: temple),
+                      ),
+                    );
                   },
                 );
               },
@@ -144,29 +122,70 @@ class _TempleListPageState extends State<TempleListPage> {
     );
   }
 
-  // ✅ 保存されているチェック状態を読み込み
   Future<void> _loadVisited() async {
     final prefs = await SharedPreferences.getInstance();
     final savedList = prefs.getStringList('visitedList');
-
     if (savedList != null) {
-      // print("復元しました: $savedList");
       setState(() {
         visited = savedList.map((e) => e == 'true').toList();
       });
     }
   }
 
-  // ✅ チェック状態を保存
   Future<void> _saveVisited() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(
       'visitedList',
       visited.map((e) => e.toString()).toList(),
     );
-    print("保存しました: $visited");
-    // 保存直後に確認
-    // final check = prefs.getStringList('visitedList');
-    // print("保存直後に読み出し: $check");
+  }
+}
+
+// ✅ 詳細ページに地図を追加
+class TempleDetailPage extends StatelessWidget {
+  final Temple temple;
+
+  const TempleDetailPage({super.key, required this.temple});
+
+  @override
+  Widget build(BuildContext context) {
+    final LatLng templePosition = LatLng(temple.lat, temple.lng); // 緯度経度を使用
+
+    return Scaffold(
+      appBar: AppBar(title: Text(temple.name)),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Image.asset(
+            temple.imagePath,
+            width: double.infinity,
+            height: 200,
+            fit: BoxFit.cover,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              temple.description,
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+          Expanded(
+            child: GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: templePosition,
+                zoom: 14.0,
+              ),
+              markers: {
+                Marker(
+                  markerId: MarkerId(temple.name),
+                  position: templePosition,
+                  infoWindow: InfoWindow(title: temple.name),
+                ),
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
