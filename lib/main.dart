@@ -88,6 +88,14 @@ class _TempleListPageState extends State<TempleListPage> {
                     width: 50,
                     height: 50,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      // ✅ 画像がない場合にお寺アイコンを表示
+                      return const Icon(
+                        Icons.temple_buddhist, // 🏯 お寺アイコン
+                        size: 40,
+                        color: Colors.grey,
+                      );
+                    },
                   ),
                   title: Text('${temple.number}. ${temple.name}'),
                   subtitle: Text(temple.prefecture),
@@ -157,6 +165,14 @@ class TempleDetailPage extends StatelessWidget {
             width: double.infinity,
             height: 200,
             fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              // ✅ 画像がない場合にお寺アイコンを表示
+              return const Icon(
+                Icons.temple_buddhist, // 🏯 お寺アイコン
+                size: 40,
+                color: Colors.grey,
+              );
+  },
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
