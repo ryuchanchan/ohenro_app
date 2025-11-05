@@ -82,41 +82,45 @@ class _TempleListPageState extends State<TempleListPage> {
               itemCount: allTemples.length,
               itemBuilder: (context, index) {
                 final temple = allTemples[index];
-                return ListTile(
-                  leading: Image.asset(
-                    temple.imagePath,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      // ✅ 画像がない場合にお寺アイコンを表示
-                      return const Icon(
-                        Icons.temple_buddhist, // 🏯 お寺アイコン
-                        size: 40,
-                        color: Colors.grey,
+                return Card(
+                  elevation: 4,
+                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.asset(
+                        temple.imagePath,
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.temple_buddhist, size: 40, color: Colors.grey);
+                        },
+                      ),
+                    ),
+                    title: Text('${temple.number}. ${temple.name}'),
+                    subtitle: Text(temple.prefecture),
+                    trailing: Checkbox(
+                      value: visited[index],
+                      onChanged: (bool? value) {
+                        setState(() {
+                          visited[index] = value ?? false;
+                        });
+                        _saveVisited();
+                      },
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TempleDetailPage(temple: temple),
+                        ),
                       );
                     },
                   ),
-                  title: Text('${temple.number}. ${temple.name}'),
-                  subtitle: Text(temple.prefecture),
-                  trailing: Checkbox(
-                    value: visited[index],
-                    onChanged: (bool? value) {
-                      setState(() {
-                        visited[index] = value ?? false;
-                      });
-                      _saveVisited();
-                    },
-                  ),
-                  onTap: () {
-                    // ✅ 詳細ページに遷移
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TempleDetailPage(temple: temple),
-                      ),
-                    );
-                  },
                 );
               },
             ),
