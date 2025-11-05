@@ -6,10 +6,6 @@ import 'data/temples_all.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-Future<void> main() async {
-  await dotenv.load();
-  runApp(MyApp());
-}
 
 void main() {
   runApp(const OhenroApp());
