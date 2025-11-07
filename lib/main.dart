@@ -5,6 +5,7 @@ import 'data/temples.dart';
 import 'data/temples_all.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 void main() {
@@ -50,7 +51,15 @@ class _TempleListPageState extends State<TempleListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('お遍路リスト')),
+      backgroundColor: const Color(0xFFF7F3E9), // 和紙っぽい背景
+      appBar: AppBar(
+        title: Text(
+        '四国８８か所お遍路リスト編',
+        style: GoogleFonts.zenMaruGothic(fontWeight: FontWeight.w900),
+        ),
+        backgroundColor: const Color(0xFF3A5F41), // 落ち着いた深緑
+        elevation: 0,
+      ),
       body: Column(
         children: [
           // ✅ 進捗バー
@@ -83,12 +92,12 @@ class _TempleListPageState extends State<TempleListPage> {
               itemBuilder: (context, index) {
                 final temple = allTemples[index];
                 return Card(
-                  color: const Color(0xFFFAF4E6),
-                  elevation: 2,
-                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  color: const Color(0xFFF9F6EF),
+                  elevation: 3,
+                  margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    side: const BorderSide(color: Color(0xFFD44A2E), width: 1), // 朱色の縁
+                    borderRadius: BorderRadius.circular(16),
+                    side: const BorderSide(color: Color(0xFFD4A373), width: 1.4),
                   ),
                   child: ListTile(
                     leading: ClipRRect(
@@ -103,11 +112,13 @@ class _TempleListPageState extends State<TempleListPage> {
                         },
                       ),
                     ),
-                    title: Text('${temple.number}. ${temple.name}'),
+                    title: Text('${temple.number}番 ${temple.name}',
+                    style: GoogleFonts.notoSerifJp(fontWeight: FontWeight.w600),
+                    ),
                     subtitle: Text(temple.prefecture),
                     trailing: Checkbox(
                       value: visited[index],
-                      onChanged: (bool? value) {
+                      onChanged: (value) {
                         setState(() {
                           visited[index] = value ?? false;
                         });
