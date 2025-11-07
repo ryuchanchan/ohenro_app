@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+// import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'data/temples.dart';
+// import 'data/temples.dart';
 import 'data/temples_all.dart';
+import 'pages/temple_detail_page.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 
@@ -54,7 +56,7 @@ class _TempleListPageState extends State<TempleListPage> {
       backgroundColor: const Color(0xFFF7F3E9), // 和紙っぽい背景
       appBar: AppBar(
         title: Text(
-        '四国８８か所お遍路リスト編',
+        '四国８８か所お遍路リスト',
         style: GoogleFonts.zenMaruGothic(fontWeight: FontWeight.w900),
         ),
         backgroundColor: const Color(0xFF3A5F41), // 落ち着いた深緑
@@ -158,63 +160,6 @@ class _TempleListPageState extends State<TempleListPage> {
     await prefs.setStringList(
       'visitedList',
       visited.map((e) => e.toString()).toList(),
-    );
-  }
-}
-
-// ✅ 詳細ページに地図を追加
-class TempleDetailPage extends StatelessWidget {
-  final Temple temple;
-
-  const TempleDetailPage({super.key, required this.temple});
-
-  @override
-  Widget build(BuildContext context) {
-    final LatLng templePosition = LatLng(temple.lat, temple.lng); // 緯度経度を使用
-
-    return Scaffold(
-      appBar: AppBar(title: Text(temple.name)),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Image.asset(
-            temple.imagePath,
-            width: double.infinity,
-            height: 200,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              // ✅ 画像がない場合にお寺アイコンを表示
-              return const Icon(
-                Icons.temple_buddhist, // 🏯 お寺アイコン
-                size: 40,
-                color: Colors.grey,
-              );
-  },
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              temple.description,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-          Expanded(
-            child: GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: templePosition,
-                zoom: 14.0,
-              ),
-              markers: {
-                Marker(
-                  markerId: MarkerId(temple.name),
-                  position: templePosition,
-                  infoWindow: InfoWindow(title: temple.name),
-                ),
-              },
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
