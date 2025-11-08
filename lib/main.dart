@@ -59,7 +59,7 @@ class _TempleListPageState extends State<TempleListPage> {
         '四国８８か所お遍路リスト',
         style: GoogleFonts.zenMaruGothic(fontWeight: FontWeight.w900),
         ),
-        backgroundColor: const Color(0xFF3A5F41), // 落ち着いた深緑
+        backgroundColor: const Color(0xFF3A5F41),
         elevation: 0,
       ),
       body: Column(
@@ -127,13 +127,25 @@ class _TempleListPageState extends State<TempleListPage> {
                         _saveVisited();
                       },
                     ),
-                    onTap: () {
-                      Navigator.push(
+                    // onTap: () {
+                    //   Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (context) => TempleDetailPage(temple: temple),
+                    //     ),
+                    //   );
+                    // },
+                    onTap: () async {
+                      final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => TempleDetailPage(temple: temple),
+                          builder: (context) => TempleDetailPage(temple: temple, index: index),
                         ),
                       );
+
+                      if (result == true) {
+                        _loadVisited(); // ← ✅ 参拝済み更新を反映
+                      }
                     },
                   ),
                 );
